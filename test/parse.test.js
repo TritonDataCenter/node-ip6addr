@@ -16,6 +16,12 @@ var test = require('tape').test;
 var parse;
 
 
+///--- Helpers
+
+function pb(input) {
+  return parse.bind(null, input);
+}
+
 ///--- Tests
 
 test('load library', function (t) {
@@ -28,10 +34,12 @@ test('parse ipv4', function (t) {
   t.ok(parse('2.3.4.5'));
   t.end();
 });
+
 test('parse ipv4-mapped', function (t) {
   t.ok(parse('::ffff:10.2.3.4'));
   t.end();
 });
+
 test('parse ipv6', function (t) {
   t.ok(parse('::1'));
   t.ok(parse('2001:0db8:85a3::8a2e:370:7334'));
@@ -42,9 +50,6 @@ test('parse ipv6', function (t) {
 });
 
 test('parse bad', function (t) {
-  function pb(input) {
-    return parse.bind(null, input);
-  }
   t.throws(pb({}), null, 'string required');
   t.throws(pb('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'), null,
     'input too long');
@@ -71,5 +76,15 @@ test('parse passthrough', function (t) {
   t.throws(function () {
     parse({});
   }, null, 'will not parse non-Addr object');
+  t.end();
+});
+
+test('parse long', function (t) {
+  t.ok(parse(0));
+  t.equal(parse(2130706433).toString(), '127.0.0.1');
+  t.ok(parse(4294967295));
+  t.throws(pb(-1), null, 'negative throws');
+  t.throws(pb(4294967296), 'too large throws');
+  t.throws(pb(1.5), null, 'float throws');
   t.end();
 });

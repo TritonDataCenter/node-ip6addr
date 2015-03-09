@@ -469,9 +469,10 @@ function parseString(input) {
 
 function parseLong(input) {
   assert.number(input);
-  input = input | 0;
-  if (input < 0 || input >= (1 << 32)) {
-    /* only support 32bit values for parsing */
+  if (input !== Math.floor(input)) {
+    throw new Error('Value must be integer');
+  }
+  if (input < 0 || input > 0xffffffff) {
     throw new Error('Value must be 32 bit');
   }
   var out = new Addr();
