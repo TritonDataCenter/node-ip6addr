@@ -63,3 +63,13 @@ test('parse bad', function (t) {
   t.throws(pb('::fffe:1.2.3.4'), null, 'invalid ipv4 mapping');
   t.end();
 });
+
+test('parse passthrough', function (t) {
+  var val = parse('2.3.4.5');
+  t.ok(val);
+  t.ok(parse(val));
+  t.throws(function () {
+    parse({});
+  }, null, 'will not parse non-Addr object');
+  t.end();
+});

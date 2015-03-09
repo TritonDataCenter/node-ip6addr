@@ -46,7 +46,7 @@ function _isAddr(addr) {
 
 function _toAddr(input) {
   if (typeof (input) === 'string') {
-    return parse(input);
+    return ip6addrParse(input);
   } else if (_isAddr(input)) {
     return input;
   } else {
@@ -299,11 +299,13 @@ AddrRange.prototype.contains = function contains(input) {
 
 ///--- Public Functions
 
-function parse(input) {
+function ip6addrParse(input) {
   if (typeof (input) === 'string') {
     return parseString(input);
   } else if (typeof (input) === 'number') {
     return parseLong(input);
+  } else if (typeof (input) === 'object' && _isAddr(input)) {
+    return input;
   } else {
     throw new Error('Invalid argument: only string|number allowed');
   }
@@ -501,7 +503,7 @@ function ip6addrCompare(a, b) {
 ///--- Exports
 
 module.exports = {
-  parse: parse,
+  parse: ip6addrParse,
   compare: ip6addrCompare,
   createCIDR: function (addr, len) {
     return new CIDR(addr, len);
