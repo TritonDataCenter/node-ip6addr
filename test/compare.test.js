@@ -28,18 +28,41 @@ test('load library', function (t) {
 });
 
 test('compare ipv4', function (t) {
-  t.equal(compare(parse('1.2.3.4'), parse('1.2.3.4')), 0);
-  t.equal(compare(parse('1.2.3.3'), parse('1.2.3.4')), -1);
-  t.equal(compare(parse('1.2.3.5'), parse('1.2.3.4')), 1);
+  var ipv4comp = [
+    ['1.2.3.4', '1.2.3.4', 0],
+    ['1.2.3.3', '1.2.3.4', -1],
+    ['1.2.3.5', '1.2.3.4', 1],
+    ['1.2.3.1', '1.2.3.10', -1],
+    ['1.2.3.3', '2.1.1.1', -1],
+    ['1.2.3.5', '0.9.9.9', 1],
+    ['1.2.3.0', '1.2.2.255', 1],
+    ['1.2.255.255', '1.3.0.0', -1],
+    ['2.0.0.0', '1.255.255.255', 1]
+  ];
 
-  t.equal(compare(parse('1.2.3.3'), parse('2.1.1.1')), -1);
-  t.equal(compare(parse('1.2.3.5'), parse('0.9.9.9')), 1);
+  for (var i in ipv4comp) {
+    t.equal(compare(parse(ipv4comp[i][0]), parse(ipv4comp[i][1])),
+        ipv4comp[i][2], 'compare: ' + ipv4comp[i][0] + ' - ' + ipv4comp[i][1]);
+  }
+
   t.end();
 });
 
 test('compare ipv6', function (t) {
-  t.equal(compare(parse('2001:db8::1'), parse('2001:db8::1')), 0);
-  t.equal(compare(parse('2001:db8::'), parse('2001:db8::1')), -1);
-  t.equal(compare(parse('2001:db8::1'), parse('2001:db8::')), 1);
+  var ipv6comp = [
+    ['2001:db8::1', '2001:db8::1', 0],
+    ['2001:db8::', '2001:db8::1', -1],
+    ['2001:db8::1', '2001:db8::', 1],
+    ['::ffff:1.2.3.0', '::ffff:1.2.2.255', 1],
+    ['::ffff:8.8.8.8', '::ffff:8.8.7.7', 1],
+    ['0:0:0:0:0:ffff:808:808', '0:0:0:0:0:ffff:808:807', 1],
+    [' 2001:db8:1:0:0:0:0:0', '2001:db8:0:ffff:ffff:ffff:ffff:ffff', 1]
+  ];
+
+  for (var i in ipv6comp) {
+    t.equal(compare(parse(ipv6comp[i][0]), parse(ipv6comp[i][1])),
+        ipv6comp[i][2], 'compare: ' + ipv6comp[i][0] + ' - ' + ipv6comp[i][1]);
+  }
+
   t.end();
 });
