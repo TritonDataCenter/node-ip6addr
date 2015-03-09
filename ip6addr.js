@@ -242,7 +242,7 @@ Addr.prototype.or = function addrOr(input) {
 };
 
 Addr.prototype.compare = function compareMember(addr) {
-  return compare(this, addr);
+  return ip6addrCompare(this, addr);
 };
 
 
@@ -482,7 +482,7 @@ function parseLong(input) {
   return out;
 }
 
-function compare(a, b) {
+function ip6addrCompare(a, b) {
   a = _toAddr(a);
   b = _toAddr(b);
 
@@ -502,7 +502,7 @@ function compare(a, b) {
 
 module.exports = {
   parse: parse,
-  compare: compare,
+  compare: ip6addrCompare,
   createCIDR: function (addr, len) {
     return new CIDR(addr, len);
   },
