@@ -1,6 +1,6 @@
 {
   "name": "ip6addr",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "IPv6/IPv4 address parsing and manipulation",
   "repository": {
     "type": "git",
