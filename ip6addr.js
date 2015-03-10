@@ -146,13 +146,18 @@ function _prefixToAddr(len) {
 
 ///--- Public Classes
 
+/**
+ * IPv6/IPv4 address representation.
+ *
+ * It should not be instantiated directly by library consumers.
+ */
 function Addr() {
   this._fields = [0, 0, 0, 0, 0, 0, 0, 0];
   this._attrs = {};
 }
 
 Addr.prototype.toString = function toString(opts) {
-  /* TODO: process options */
+  /* TODO: Add options for customizing output */
   if (this._attrs.ipv4Bare) {
     return _arrayToOctetString(this._fields.slice(6));
   }
@@ -256,7 +261,15 @@ Addr.prototype.compare = function compareMember(addr) {
   return ip6addrCompare(this, addr);
 };
 
-
+/**
+ * CIDR Block
+ * @param addr CIDR network address
+ * @param prefixLen Length of network prefix
+ *
+ * The addr parameter can be an Addr object or a parseable string.
+ * If prefixLen is omitted, then addr must contain a parseable string in the
+ * form '<address>/<prefix>'.
+ */
 function CIDR(addr, prefixLen) {
   if (prefixLen === undefined) {
     /* OK to pass pass string of "<addr>/<prefix>" */
@@ -313,7 +326,13 @@ CIDR.prototype.last = function cidrLast(input) {
   }
 };
 
-
+/**
+ * Range of addresses.
+ * @param begin Beginning address of the range
+ * @param end Ending address of the range
+ *
+ * Parameters can be Addr objects or parsable address strings.
+ */
 function AddrRange(begin, end) {
   begin = _toAddr(begin);
   end = _toAddr(end);
@@ -528,6 +547,9 @@ function parseLong(input) {
   return out;
 }
 
+/**
+ * Compare Addr objects in a manner suitable for Array.sort().
+ */
 function ip6addrCompare(a, b) {
   a = _toAddr(a);
   b = _toAddr(b);
