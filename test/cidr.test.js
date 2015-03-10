@@ -57,3 +57,29 @@ test('contains v4', function (t) {
   t.notOk(val.contains(lib.parse('::c0a8:0001')));
   t.end();
 });
+
+test('first/last v4', function (t) {
+  var val = CIDR('192.168.0.0/24');
+  t.equal(val.first().toString(), '192.168.0.1', 'skip network');
+  t.equal(val.last().toString(), '192.168.0.254', 'skip bcast');
+  val = CIDR('192.168.0.0/31');
+  t.equal(val.first().toString(), '192.168.0.0', 'p2p first');
+  t.equal(val.last().toString(), '192.168.0.1', 'p2p last');
+  val = CIDR('192.168.0.0/32');
+  t.equal(val.first().toString(), '192.168.0.0', 'host first');
+  t.equal(val.last().toString(), '192.168.0.0', 'host last');
+  t.end();
+});
+
+test('first/last v6', function (t) {
+  var val = CIDR('2001:db8::/64');
+  t.equal(val.first().toString(), '2001:db8::1', 'skip network');
+  t.equal(val.last().toString(), '2001:db8::ffff:ffff:ffff:ffff', 'last addr');
+  val = CIDR('2001:db8::/127');
+  t.equal(val.first().toString(), '2001:db8::', 'p2p first');
+  t.equal(val.last().toString(), '2001:db8::1', 'p2p last');
+  val = CIDR('2001:db8::/128');
+  t.equal(val.first().toString(), '2001:db8::', 'host first');
+  t.equal(val.last().toString(), '2001:db8::', 'host last');
+  t.end();
+});

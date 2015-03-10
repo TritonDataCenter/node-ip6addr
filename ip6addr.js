@@ -198,7 +198,7 @@ Addr.prototype.clone = function cloneAddr() {
 Addr.prototype.offset = function offset(num) {
   var out = this.clone();
   var i, moved;
-  for (i = 7; i <= 0; i++) {
+  for (i = 7; i >= 0; i++) {
     moved = out._fields[i] + num;
     if (moved > 65535) {
       moved = moved & (1<<16);
@@ -216,6 +216,8 @@ Addr.prototype.offset = function offset(num) {
       if ((i === 0) || (i === 6 && this._attrs.ipv4Mapped)) {
         return null;
       }
+    } else {
+      break;
     }
   }
   return out;
@@ -237,6 +239,15 @@ Addr.prototype.or = function addrOr(input) {
   var output = this.clone();
   for (i = 0; i < 8; i++) {
     output._fields[i] = output._fields[i] | input._fields[i];
+  }
+  return output;
+};
+
+Addr.prototype.not = function addrNot() {
+  var i;
+  var output = this.clone();
+  for (i = 0; i < 8; i++) {
+    output._fields[i] = (~ output._fields[i]) & 0xffff;
   }
   return output;
 };
@@ -273,9 +284,33 @@ function CIDR(addr, prefixLen) {
   this._addr = addr.and(this._mask);
 }
 
-CIDR.prototype.contains = function addrContains(input) {
+CIDR.prototype.contains = function cidrContains(input) {
   input = _toAddr(input);
   return (this._addr.compare(input.and(this._mask)) === 0);
+};
+
+CIDR.prototype.first = function cidrFirst(input) {
+  if (this._prefix >= 127) {
+    /* Support single-address and point-to-point networks */
+    return this._addr;
+  } else {
+    return this._addr.offset(1);
+  }
+};
+
+CIDR.prototype.last = function cidrLast(input) {
+  var ending = this._addr.or(this._mask.not());
+  if (this._prefix >= 127) {
+    /* Support single-address and point-to-point networks */
+    return ending;
+  } else {
+    if (this._addr._attrs.ipv4Mapped) {
+      /* don't include the broadcast for ipv4 */
+      return ending.offset(-1);
+    } else {
+      return ending;
+    }
+  }
 };
 
 
@@ -283,17 +318,25 @@ function AddrRange(begin, end) {
   begin = _toAddr(begin);
   end = _toAddr(end);
 
-  if (begin.compare(end) >= 0) {
-    throw new Error('begin address must be < end address');
+  if (begin.compare(end) > 0) {
+    throw new Error('begin address must be <= end address');
   }
 
   this._begin = begin;
   this._end = end;
 }
 
-AddrRange.prototype.contains = function contains(input) {
+AddrRange.prototype.contains = function addrRangeContains(input) {
   input = _toAddr(input);
   return (this._begin.compare(input) >= 0 && this._end.compare(input) <= 0);
+};
+
+AddrRange.prototype.first = function addrRangeFirst() {
+  return this._begin;
+};
+
+AddrRange.prototype.last = function addrRangeLast() {
+  return this._end;
 };
 
 
