@@ -47,6 +47,14 @@ test('create - parse', function (t) {
   t.end();
 });
 
+test('create - toString', function (t) {
+  t.equal(CIDR('fd00:0045::/64').toString(), 'fd00:45::/64');
+  t.equal(CIDR('fd00:0045::abcd/128').toString(), 'fd00:45::abcd/128');
+  t.equal(CIDR('192.168.0.0/24').toString(), '192.168.0.0/24');
+  t.equal(CIDR('192.168.0.5/32').toString(), '192.168.0.5/32');
+  t.end();
+});
+
 test('contains v4', function (t) {
   var val = CIDR('192.168.0.0/24');
   t.ok(val.contains(lib.parse('192.168.0.0')), 'contains net');

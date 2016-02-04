@@ -143,6 +143,16 @@ function _prefixToAddr(len) {
   return output;
 }
 
+function _toCIDR(input) {
+  if (typeof (input) === 'string') {
+    return new CIDR(input);
+  } else if (input instanceof CIDR) {
+    return input;
+  } else {
+    throw new Error('Invalid argument: CIDR or parsable string expected');
+  }
+}
+
 
 ///--- Public Classes
 
@@ -325,6 +335,29 @@ CIDR.prototype.last = function cidrLast(input) {
     }
   }
 };
+
+CIDR.prototype.compare = function compareCIDR(cidr) {
+  return ip6cidrCompare(this, cidr);
+};
+
+CIDR.prototype.toString = function cidrString() {
+  var plen = this._prefix - (this._addr._attrs.ipv4Bare ? 96 : 0);
+  return this._addr.toString() + '/' + plen;
+};
+
+function ip6cidrCompare(a, b) {
+  a = _toCIDR(a);
+  b = _toCIDR(b);
+
+  /*
+   * We compare first on the address component, and then on the prefix length,
+   * such that the network with the smaller prefix length (the larger subnet)
+   * is greater than the network with the smaller prefix (the smaller subnet).
+   * This is the same ordering used in Postgres.
+   */
+  var cmp = ip6addrCompare(a._addr, b._addr);
+  return cmp === 0 ? b._prefix - a._prefix : cmp;
+}
 
 /**
  * Range of addresses.
@@ -574,6 +607,7 @@ module.exports = {
   createCIDR: function (addr, len) {
     return new CIDR(addr, len);
   },
+  compareCIDR: ip6cidrCompare,
   createAddrRange: function (begin, end) {
     return new AddrRange(begin, end);
   }

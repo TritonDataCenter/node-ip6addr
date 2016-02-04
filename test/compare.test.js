@@ -15,6 +15,8 @@ var test = require('tape').test;
 
 var parse;
 var compare;
+var parseCIDR;
+var compareCIDR;
 
 
 
@@ -24,6 +26,8 @@ test('load library', function (t) {
   var lib = require('../ip6addr.js');
   t.ok(parse = lib.parse);
   t.ok(compare = lib.compare);
+  t.ok(parseCIDR = lib.createCIDR);
+  t.ok(compareCIDR = lib.compareCIDR);
   t.end();
 });
 
@@ -62,6 +66,55 @@ test('compare ipv6', function (t) {
   for (var i in ipv6comp) {
     t.equal(compare(parse(ipv6comp[i][0]), parse(ipv6comp[i][1])),
         ipv6comp[i][2], 'compare: ' + ipv6comp[i][0] + ' - ' + ipv6comp[i][1]);
+  }
+
+  t.end();
+});
+
+test('compare ipv4 cidr', function (t) {
+  var ipv4comp = [
+    ['10.0.0.0/24', '180.10.2.0/24', -1],
+    ['180.10.2.0/24', '10.0.0.0/24', 1],
+    ['10.0.0.0/24', '10.0.0.0/24', 0],
+    ['10.0.0.0/25', '10.0.0.0/24', -1],
+    ['10.0.0.0/26', '10.0.0.0/24', -2],
+    ['10.0.0.0/23', '10.0.0.0/24', 1],
+    ['10.0.0.0/23', '10.0.0.0/25', 2],
+    ['10.10.0.0/25', '10.0.0.0/24', 1],
+    ['10.20.0.0/25', '10.0.0.0/24', 1],
+    ['10.0.0.0/25', '10.10.0.0/24', -1],
+    ['10.0.0.0/25', '10.20.0.0/24', -1],
+    ['10.0.0.0/25', '10.10.0.0/32', -1],
+    ['10.0.0.0/25', '10.20.0.0/32', -1]
+  ];
+
+  for (var i in ipv4comp) {
+    t.equal(compareCIDR(parseCIDR(ipv4comp[i][0]), parseCIDR(ipv4comp[i][1])),
+        ipv4comp[i][2], 'cmp cidr: ' + ipv4comp[i][0] + ' - ' + ipv4comp[i][1]);
+  }
+
+  t.end();
+});
+
+test('compare ipv6 cidr', function (t) {
+  var ipv6comp = [
+    ['2001:db8::/64', 'fe80:cf1::0/64', -1],
+    ['fe80:cf1::0/64', '2001:db8::/64', 1],
+    ['2001:db8::/64', '2001:db8::0/64', 0],
+    ['2001:db8::/65', '2001:db8::0/64', -1],
+    ['2001:db8::/66', '2001:db8::0/64', -2],
+    ['2001:db8::/64', '2001:db8::0/65', 1],
+    ['2001:db8::/64', '2001:db8::0/66', 2],
+    ['2001:eb8::/64', '2001:db8::0/66', 1],
+    ['2001:fb8::/64', '2001:db8::0/66', 1],
+    ['2001:db8::/64', '2001:eb8::0/66', -1],
+    ['2001:db8::/64', '2001:fb8::0/66', -1],
+    ['2001:cb8::/64', '2001:db8::0/65', -1]
+  ];
+
+  for (var i in ipv6comp) {
+    t.equal(compareCIDR(parseCIDR(ipv6comp[i][0]), parseCIDR(ipv6comp[i][1])),
+        ipv6comp[i][2], 'cmp cidr: ' + ipv6comp[i][0] + ' - ' + ipv6comp[i][1]);
   }
 
   t.end();
