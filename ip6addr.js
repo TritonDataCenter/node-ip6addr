@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2015, Joyent, Inc.
+ * Copyright 2016, Joyent, Inc.
  */
 
 var assert = require('assert-plus');
@@ -197,10 +197,10 @@ Addr.prototype.toBuffer = function toBuffer(buf) {
 };
 
 Addr.prototype.toLong = function toLong() {
-  if (!this._attrs.ipv4Mapped) {
+  if (!v4subnet.contains(this)) {
     throw new Error('only possible for ipv4-mapped addresses');
   }
-  return (this._fields[6] << 16) + this._fields[7];
+  return ((this._fields[6] << 16) >>> 0) + this._fields[7];
 };
 
 Addr.prototype.clone = function cloneAddr() {
@@ -344,6 +344,8 @@ CIDR.prototype.toString = function cidrString() {
   var plen = this._prefix - (this._addr._attrs.ipv4Bare ? 96 : 0);
   return this._addr.toString() + '/' + plen;
 };
+
+var v4subnet = new CIDR('::ffff:0:0', 96);
 
 function ip6cidrCompare(a, b) {
   a = _toCIDR(a);
@@ -572,9 +574,9 @@ function parseLong(input) {
   }
   var out = new Addr();
   out._fields[7] = input & 0xffff;
-  out._fields[6] = (input >> 16);
+  out._fields[6] = (input >>> 16);
   /* this is ipv4-mapped */
-  out._fields[5] = input & 0xffff;
+  out._fields[5] = 0xffff;
   out._attrs.ipv4Bare = true;
   out._attrs.ipv4Mapped = true;
   return out;

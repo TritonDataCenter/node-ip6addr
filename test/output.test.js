@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2015, Joyent, Inc.
+ * Copyright 2016, Joyent, Inc.
  */
 
 var test = require('tape').test;
@@ -27,6 +27,12 @@ test('load library', function (t) {
 test('output long', function (t) {
   var addr = lib.parse('1.2.3.4');
   t.equal(addr.toLong(), 16909060);
+  addr = lib.parse('192.168.0.2');
+  t.equal(addr.toLong(),  3232235522);
+  addr = lib.parse('255.255.255.255');
+  t.equal(addr.toLong(),  4294967295);
+  addr = lib.parse('0.0.0.0');
+  t.equal(addr.toLong(),  0);
   addr = lib.parse('::1');
   t.throws(addr.toLong.bind(addr), null, 'no long for ipv6');
   t.end();

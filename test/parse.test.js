@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2015, Joyent, Inc.
+ * Copyright 2016, Joyent, Inc.
  */
 
 var test = require('tape').test;
@@ -82,7 +82,15 @@ test('parse passthrough', function (t) {
 test('parse long', function (t) {
   t.ok(parse(0));
   t.equal(parse(2130706433).toString(), '127.0.0.1');
-  t.ok(parse(4294967295));
+  t.equal(parse(4294967295).toString(), '255.255.255.255');
+  t.equal(parse(0).toString(), '0.0.0.0');
+  t.equal(parse(3232235522).toString(), '192.168.0.2');
+
+  var strAddr = parse('1.2.3.4');
+  var longAddr = parse(16909060);
+  t.equal(0, strAddr.compare(longAddr),
+      'parsing as string or long should be equivalent');
+
   t.throws(pb(-1), null, 'negative throws');
   t.throws(pb(4294967296), 'too large throws');
   t.throws(pb(1.5), null, 'float throws');
