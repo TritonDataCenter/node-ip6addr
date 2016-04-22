@@ -70,3 +70,24 @@ test('output ipv4-mapped', function (t) {
   t.equal(addr.toString(), '::ffff:1.2.3.4');
   t.end();
 });
+
+test('output options', function (t) {
+  var addr = lib.parse('::ffff:1.2.3.4');
+  t.equal(addr.toString({ format: 'v6' }), '::ffff:102:304');
+  t.equal(addr.toString({ format: 'v4' }), '1.2.3.4');
+  t.equal(addr.toString({ format: 'auto' }), '::ffff:1.2.3.4');
+  t.equal(addr.toString({ }), '::ffff:1.2.3.4');
+  t.equal(addr.toString({ format: 'v6', zeroElide: false }),
+    '0:0:0:0:0:ffff:102:304');
+  t.equal(addr.toString({ format: 'v6', zeroElide: true }),
+    '::ffff:102:304');
+  t.equal(addr.toString({ format: 'v6', zeroPad: true }),
+    '::ffff:0102:0304');
+  t.equal(addr.toString({ format: 'v6', zeroElide: true, zeroPad: true }),
+    '::ffff:0102:0304');
+  t.equal(addr.toString({ format: 'v6', zeroElide: false, zeroPad: true }),
+    '0000:0000:0000:0000:0000:ffff:0102:0304');
+  t.equal(addr.toString({ zeroElide: false, zeroPad: true }),
+    '0000:0000:0000:0000:0000:ffff:1.2.3.4');
+  t.end();
+});

@@ -153,6 +153,19 @@ function _toCIDR(input) {
   }
 }
 
+var strDefaults = {
+  format: 'auto', // Control format of printed address
+  zeroElide: true, // Elide longest run of zeros
+  zeroPad: false // Pad with zeros when a group would print as < 4 chars
+};
+
+function getStrOpt(opts, name) {
+  if (opts && opts.hasOwnProperty(name)) {
+    return opts[name];
+  } else {
+    return strDefaults[name];
+  }
+}
 
 ///--- Public Classes
 
@@ -175,18 +188,51 @@ Addr.prototype.kind = function getKind() {
 };
 
 Addr.prototype.toString = function toString(opts) {
-  /* TODO: Add options for customizing output */
-  if (this._attrs.ipv4Bare) {
+  assert.optionalObject(opts, 'opts');
+  var format = getStrOpt(opts, 'format');
+  var zeroElide = getStrOpt(opts, 'zeroElide');
+  var zeroPad = getStrOpt(opts, 'zeroPad');
+
+  assert.string(format, 'opts.format');
+  assert.bool(zeroElide, 'opts.zeroElide');
+  assert.bool(zeroPad, 'opts.zeroPad');
+
+  // Try to print the address the way it was originally formatted
+  if (format === 'auto') {
+    if (this._attrs.ipv4Bare) {
+      format = 'v4';
+    } else if (this._attrs.ipv4Mapped) {
+      format = 'v4-mapped';
+    } else {
+      format = 'v6';
+    }
+  }
+
+  switch (format) {
+  // Print in dotted-quad notation (but only if truly IPv4)
+  case 'v4':
+    if (!v4subnet.contains(this)) {
+        throw new Error('cannot print non-v4 address in dotted quad notation');
+    }
     return _arrayToOctetString(this._fields.slice(6));
-  }
-  var output;
-  if (this._attrs.ipv4Mapped) {
-    output = _arrayToHex(this._fields.slice(0, 6), true, false);
+
+  // Print as an IPv4-mapped IPv6 address
+  case 'v4-mapped':
+    if (!v4subnet.contains(this)) {
+        throw new Error('cannot print non-v4 address as a v4-mapped address');
+    }
+    var output = _arrayToHex(this._fields.slice(0, 6), zeroElide, zeroPad);
     output.push(_arrayToOctetString(this._fields.slice(6)));
-  } else {
-    output = _arrayToHex(this._fields, true, false);
+    return output.join(':');
+
+  // Print as an IPv6 address
+  case 'v6':
+    return _arrayToHex(this._fields, zeroElide, zeroPad).join(':');
+
+  // Unrecognized formatting method
+  default:
+    throw new Error('unrecognized format method "' + format + '"');
   }
-  return output.join(':');
 };
 
 Addr.prototype.toBuffer = function toBuffer(buf) {
@@ -348,9 +394,34 @@ CIDR.prototype.compare = function compareCIDR(cidr) {
   return ip6cidrCompare(this, cidr);
 };
 
-CIDR.prototype.toString = function cidrString() {
-  var plen = this._prefix - (this._addr._attrs.ipv4Bare ? 96 : 0);
-  return this._addr.toString() + '/' + plen;
+CIDR.prototype.prefixLength = function getPrefixLength(format) {
+  assert.optionalString(format, 'format');
+  if (format === undefined || format === 'auto') {
+    format = this._addr._attrs.ipv4Bare ? 'v4' : 'v6';
+  }
+
+  switch (format) {
+  case 'v4':
+    if (!v4subnet.contains(this._addr)) {
+        throw new Error('cannot return v4 prefix length for non-v4 address');
+    }
+    return this._prefix - 96;
+  case 'v6':
+    return this._prefix;
+  default:
+    throw new Error('unrecognized format method "' + format + '"');
+  }
+};
+
+CIDR.prototype.toString = function cidrString(opts) {
+  assert.optionalObject(opts, 'opts');
+
+  var format = getStrOpt(opts, 'format');
+  if (format === 'v4-mapped') {
+    format = 'v6';
+  }
+
+  return this._addr.toString(opts) + '/' + this.prefixLength(format);
 };
 
 var v4subnet = new CIDR('::ffff:0:0', 96);

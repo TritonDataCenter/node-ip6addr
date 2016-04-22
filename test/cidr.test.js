@@ -48,10 +48,37 @@ test('create - parse', function (t) {
 });
 
 test('create - toString', function (t) {
-  t.equal(CIDR('fd00:0045::/64').toString(), 'fd00:45::/64');
+  var cidr = CIDR('fd00:0045::/64');
+  t.equal(cidr.toString(), 'fd00:45::/64');
+  t.equal(cidr.toString({ format: 'v6', zeroPad: true }),
+    'fd00:0045::/64');
   t.equal(CIDR('fd00:0045::abcd/128').toString(), 'fd00:45::abcd/128');
-  t.equal(CIDR('192.168.0.0/24').toString(), '192.168.0.0/24');
+  cidr = CIDR('192.168.0.0/24');
+  t.equal(cidr.toString(), '192.168.0.0/24');
+  t.equal(cidr.toString({ format: 'v4' }), '192.168.0.0/24');
+  t.equal(cidr.toString({ format: 'auto' }), '192.168.0.0/24');
+  t.equal(cidr.toString({ format: 'v4-mapped' }), '::ffff:192.168.0.0/120');
+  t.equal(cidr.toString({ format: 'v6' }), '::ffff:c0a8:0/120');
   t.equal(CIDR('192.168.0.5/32').toString(), '192.168.0.5/32');
+  t.end();
+});
+
+test('create - prefixLength', function (t) {
+  var cidr = CIDR('fd00:0045::/64');
+  t.equal(cidr.prefixLength(), 64);
+  t.equal(cidr.prefixLength('v6'), 64);
+  t.equal(cidr.prefixLength('auto'), 64);
+  t.throws(cidr.prefixLength.bind(cidr, 'foo'), null,
+      'bad format option');
+  t.throws(cidr.prefixLength.bind(cidr, 'v4'), null,
+      'can\'t format prefix length as v4 length');
+  cidr = CIDR('192.168.0.0/24');
+  t.equal(cidr.prefixLength(), 24);
+  t.equal(cidr.prefixLength('v4'), 24);
+  t.equal(cidr.prefixLength('auto'), 24);
+  t.equal(cidr.prefixLength('v6'), 120);
+  t.throws(cidr.prefixLength.bind(cidr, 'bar'), null,
+      'bad format option');
   t.end();
 });
 
