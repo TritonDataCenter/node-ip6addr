@@ -166,6 +166,14 @@ function Addr() {
   this._attrs = {};
 }
 
+Addr.prototype.kind = function getKind() {
+  if (v4subnet.contains(this)) {
+    return 'ipv4';
+  } else {
+    return 'ipv6';
+  }
+};
+
 Addr.prototype.toString = function toString(opts) {
   /* TODO: Add options for customizing output */
   if (this._attrs.ipv4Bare) {
