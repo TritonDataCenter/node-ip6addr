@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2015, Joyent, Inc.
+ * Copyright 2016, Joyent, Inc.
  */
 
 var test = require('tape').test;
@@ -60,7 +60,7 @@ test('compare ipv6', function (t) {
     ['::ffff:1.2.3.0', '::ffff:1.2.2.255', 1],
     ['::ffff:8.8.8.8', '::ffff:8.8.7.7', 1],
     ['0:0:0:0:0:ffff:808:808', '0:0:0:0:0:ffff:808:807', 1],
-    [' 2001:db8:1:0:0:0:0:0', '2001:db8:0:ffff:ffff:ffff:ffff:ffff', 1]
+    ['2001:db8:1:0:0:0:0:0', '2001:db8:0:ffff:ffff:ffff:ffff:ffff', 1]
   ];
 
   for (var i in ipv6comp) {
@@ -117,5 +117,15 @@ test('compare ipv6 cidr', function (t) {
         ipv6comp[i][2], 'cmp cidr: ' + ipv6comp[i][0] + ' - ' + ipv6comp[i][1]);
   }
 
+  t.end();
+});
+
+test('bad cidr comparisons', function (t) {
+  var cidr = parseCIDR('fd00::/64');
+  t.throws(cidr.compare.bind(cidr, {}), null, 'Compared to empty object');
+  t.throws(cidr.compare.bind(cidr, 'asdfasdf'), null,
+      'Compared to garbage string');
+  t.throws(cidr.compare.bind(cidr, true), null,
+      'Compared to boolean');
   t.end();
 });

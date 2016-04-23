@@ -338,7 +338,7 @@ function CIDR(addr, prefixLen) {
   if (prefixLen === undefined) {
     /* OK to pass pass string of "<addr>/<prefix>" */
     assert.string(addr);
-    var fields = addr.match(/([a-fA-F0-9:.]+)\/([0-9]+)/);
+    var fields = addr.match(/^([a-fA-F0-9:.]+)\/([0-9]+)$/);
     if (fields === null) {
       throw new Error('Invalid argument: <addr>/<prefix> expected');
     }
@@ -591,18 +591,20 @@ function parseString(input) {
   }
 
   /* Parse integer values */
-  var num;
+  var field, num;
   for (i = 0; i < ip6Fields.length; i++) {
-    num = parseInt(ip6Fields[i], 16);
-    if (num < 0 || num > 65535) {
-      throw new ParseError(input, 'Invalid field value:' + num);
+    field = ip6Fields[i];
+    num = Number('0x' + field);
+    if (isNaN(num) || num < 0 || num > 65535) {
+      throw new ParseError(input, 'Invalid field value: ' + field);
     }
     ip6Fields[i] = num;
   }
   for (i = 0; i < ip4Fields.length; i++) {
-    num = parseInt(ip4Fields[i], 10);
-    if (num < 0 || num > 255) {
-      throw new ParseError(input, 'Invalid field value:' + num);
+    field = ip4Fields[i];
+    num = Number(field);
+    if (parseInt(field, 10) !== num || num < 0 || num > 255) {
+      throw new ParseError(input, 'Invalid field value: ' + field);
     }
     ip4Fields[i] = num;
   }

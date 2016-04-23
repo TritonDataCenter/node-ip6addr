@@ -51,6 +51,11 @@ test('parse ipv6', function (t) {
 
 test('parse bad', function (t) {
   t.throws(pb({}), null, 'string required');
+  t.throws(pb('fd00::40e/64'), null, 'Invalid field value: 40e/64');
+  t.throws(pb('fd00::0xc'), null, 'Invalid field value: 0xc');
+  t.throws(pb('1.2.3.4/24'), null, 'Invalid field value: 4/24');
+  t.throws(pb('1.2.3.4q'), null, 'Invalid field value: 4q');
+  t.throws(pb('1.2.3.0xb'), null, 'Invalid field value: 0xb');
   t.throws(pb('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'), null,
     'input too long');
   t.throws(pb('ff::ff::ff'), null,

@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (c) 2015, Joyent, Inc.
+ * Copyright 2016, Joyent, Inc.
  */
 
 var test = require('tape').test;
@@ -18,8 +18,8 @@ var lib;
 
 ///--- Helpers
 
-function bc(input) {
-  return CIDR.bind(null, input);
+function bc(input, plen) {
+  return CIDR.bind(null, input, plen);
 }
 
 
@@ -44,6 +44,12 @@ test('create - parse', function (t) {
   t.throws(bc('bogus'), null, 'bogus string');
   t.throws(bc('192.168.0.0/33'), null, 'long v4 prefix');
   t.throws(bc('dead:beef::/129'), null, 'long v6 prefix');
+  t.throws(bc('192.168.0.0/16abcd'), null, 'bad v4 prefix');
+  t.throws(bc('dead:beef::/64abcd'), null, 'bad v6 prefix');
+  t.throws(bc('q192.168.0.0/16'), null, 'bad v4 string');
+  t.throws(bc('qdead:beef::/64'), null, 'bad v6 string');
+  t.throws(bc(true, 64), null, 'boolean argument');
+  t.throws(bc(undefined, 24), null, 'undefined argument');
   t.end();
 });
 
