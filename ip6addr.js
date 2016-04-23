@@ -27,6 +27,10 @@ function ParseError(input, message, index) {
 }
 util.inherits(ParseError, Error);
 
+function modulo(a, n) {
+  return (n + (a % n)) % n;
+}
+
 function _arrayToOctetString(input) {
   var out;
   out = (input[0] >> 8) + '.' + (input[0] & 0xff) + '.';
@@ -265,16 +269,19 @@ Addr.prototype.clone = function cloneAddr() {
 };
 
 Addr.prototype.offset = function offset(num) {
+  if (num < -4294967295 || num > 4294967295) {
+    throw new Error('offsets should be between -4294967295 and 4294967295');
+  }
   var out = this.clone();
   var i, moved;
-  for (i = 7; i >= 0; i++) {
+  for (i = 7; i >= 0; i--) {
     moved = out._fields[i] + num;
     if (moved > 65535) {
-      moved = moved & (1<<16);
-      num = num >> 16;
+      num = moved >>> 16;
+      moved = moved & 0xffff;
     } else if (moved < 0) {
-      moved = (1<<16) + (moved % (1<<16));
-      num = (num >> 16) - 1;
+      num = Math.floor(moved / (1 << 16));
+      moved = modulo(moved, 1 << 16);
     } else {
       num = 0;
     }
