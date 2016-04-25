@@ -124,3 +124,20 @@ test('first/last v6', function (t) {
   t.equal(val.last().toString(), '2001:db8::', 'host last');
   t.end();
 });
+
+test('broadcast addresses', function (t) {
+  var val = CIDR('1.2.0.0/16');
+  t.equal(val.broadcast().toString(), '1.2.255.255');
+  val = CIDR('1.2.0.0/24');
+  t.equal(val.broadcast().toString(), '1.2.0.255');
+  val = CIDR('10.0.0.0/8');
+  t.equal(val.broadcast().toString(), '10.255.255.255');
+  val = CIDR('10.0.0.0/16');
+  t.equal(val.broadcast().toString(), '10.0.255.255');
+  val = CIDR('::ffff:192.168.0.0/112');
+  t.equal(val.broadcast().toString(), '::ffff:192.168.255.255');
+  val = CIDR('2001:db8::/64');
+  t.throws(val.broadcast.bind(val), null,
+      'IPv6 network has no broadcast address');
+  t.end();
+});

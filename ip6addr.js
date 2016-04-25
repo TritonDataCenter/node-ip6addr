@@ -397,6 +397,13 @@ CIDR.prototype.last = function cidrLast(input) {
   }
 };
 
+CIDR.prototype.broadcast = function getBroadcast() {
+  if (!v4subnet.contains(this._addr)) {
+    throw new Error('Only IPv4 networks have broadcast addresses');
+  }
+  return this._addr.or(this._mask.not());
+};
+
 CIDR.prototype.compare = function compareCIDR(cidr) {
   return ip6cidrCompare(this, cidr);
 };
