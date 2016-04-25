@@ -475,7 +475,7 @@ function AddrRange(begin, end) {
 
 AddrRange.prototype.contains = function addrRangeContains(input) {
   input = _toAddr(input);
-  return (this._begin.compare(input) >= 0 && this._end.compare(input) <= 0);
+  return (this._begin.compare(input) <= 0 && this._end.compare(input) >= 0);
 };
 
 AddrRange.prototype.first = function addrRangeFirst() {
