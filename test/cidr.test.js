@@ -88,6 +88,26 @@ test('create - prefixLength', function (t) {
   t.end();
 });
 
+test('create - address', function (t) {
+  var cidr = CIDR('fd00:0045::/64');
+  t.equal(cidr.address().toString(), 'fd00:45::');
+  cidr = CIDR('fe80::1/64');
+  t.equal(cidr.address().toString(), 'fe80::');
+  cidr = CIDR('fe80::20e:1/64');
+  t.equal(cidr.address().toString(), 'fe80::');
+  cidr = CIDR('fe80:40f::20e:1/64');
+  t.equal(cidr.address().toString(), 'fe80:40f::');
+  cidr = CIDR('192.168.0.0/24');
+  t.equal(cidr.address().toString(), '192.168.0.0');
+  cidr = CIDR('192.168.0.1/24');
+  t.equal(cidr.address().toString(), '192.168.0.0');
+  cidr = CIDR('192.168.5.1/24');
+  t.equal(cidr.address().toString(), '192.168.5.0');
+  cidr = CIDR('192.168.5.1/16');
+  t.equal(cidr.address().toString(), '192.168.0.0');
+  t.end();
+});
+
 test('contains v4', function (t) {
   var val = CIDR('192.168.0.0/24');
   t.ok(val.contains(lib.parse('192.168.0.0')), 'contains net');

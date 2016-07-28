@@ -427,6 +427,10 @@ CIDR.prototype.prefixLength = function getPrefixLength(format) {
   }
 };
 
+CIDR.prototype.address = function getAddressComponent() {
+  return this._addr;
+};
+
 CIDR.prototype.toString = function cidrString(opts) {
   assert.optionalObject(opts, 'opts');
 
