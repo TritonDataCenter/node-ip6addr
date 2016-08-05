@@ -1,5 +1,9 @@
 # ip6addr Changelog
 
+## 0.2.1
+
+- Add CIDR.address() for getting the address component of a CIDR
+
 ## 0.2.0
 
 - Add CIDR.broadcast() method
