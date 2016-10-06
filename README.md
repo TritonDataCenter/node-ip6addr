@@ -1,3 +1,5 @@
+# ip6addr
+
 ip6addr is a small library for manipulating IP addresses in Javascript.
 Inspired by [ipaddr.js](https://github.com/whitequark/ipaddr.js), ip6addr
 focuses on better IPv6 support, particularly in cases where IPv4 and IPv6

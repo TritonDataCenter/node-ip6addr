@@ -1,5 +1,10 @@
 # ip6addr Changelog
 
+## 0.2.2
+
+- Simplify Addr.clone()
+- Update `assert-plus` dependency to 1.0.0
+
 ## 0.2.1
 
 - Add CIDR.address() for getting the address component of a CIDR

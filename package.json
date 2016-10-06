@@ -1,6 +1,6 @@
 {
   "name": "ip6addr",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "IPv6/IPv4 address parsing and manipulation",
   "keywords": [ "ip", "ipv4", "ipv6", "cidr", "subnet" ],
   "repository": {
@@ -9,7 +9,7 @@
   },
   "main": "ip6addr.js",
   "dependencies": {
-    "assert-plus": "0.1.5"
+    "assert-plus": "^1.0.0"
   },
   "devDependencies": {
     "istanbul": "^0.3.6",
@@ -19,5 +19,5 @@
     "test": "./node_modules/.bin/istanbul cover --print none test/runall.js"
   },
   "author": "Joyent (joyent.com)",
-  "license": "MPL-2"
+  "license": "MPL-2.0"
 }
