@@ -9,7 +9,6 @@
   },
   "main": "ip6addr.js",
   "dependencies": {
-    "clone": "1.0.0",
     "assert-plus": "0.1.5"
   },
   "devDependencies": {

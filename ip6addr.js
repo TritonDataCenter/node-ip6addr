@@ -9,7 +9,6 @@
  */
 
 var assert = require('assert-plus');
-var clone = require('clone');
 var util = require('util');
 
 
@@ -263,8 +262,10 @@ Addr.prototype.toLong = function toLong() {
 
 Addr.prototype.clone = function cloneAddr() {
   var out = new Addr();
-  out._fields = clone(this._fields);
-  out._attrs = clone(this._attrs);
+  out._fields = this._fields.slice();
+  for (var k in this._attrs) {
+      out._attrs[k] = this._attrs[k];
+  }
   return out;
 };
 
