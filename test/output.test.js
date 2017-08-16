@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright 2016, Joyent, Inc.
+ * Copyright 2017, Joyent, Inc.
  */
 
 var test = require('tape').test;
@@ -56,6 +56,16 @@ test('output ipv6', function (t) {
   t.equal(addr.toString(), '::');
   addr = lib.parse('a::b');
   t.equal(addr.toString(), 'a::b');
+  t.end();
+});
+
+test('output ipv6 (multiple groups of zero)', function (t) {
+  var addr = lib.parse('fd00:3:0:0:1:0:0:0');
+  t.equal(addr.toString(), 'fd00:3:0:0:1::');
+  addr = lib.parse('fd00:3:0:0:1:1:0:0');
+  t.equal(addr.toString(), 'fd00:3::1:1:0:0');
+  addr = lib.parse('fd00:3:0:0:1:1:1:0');
+  t.equal(addr.toString(), 'fd00:3::1:1:1:0');
   t.end();
 });
 
