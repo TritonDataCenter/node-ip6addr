@@ -374,7 +374,7 @@ CIDR.prototype.contains = function cidrContains(input) {
   return (this._addr.compare(input.and(this._mask)) === 0);
 };
 
-CIDR.prototype.first = function cidrFirst(input) {
+CIDR.prototype.first = function cidrFirst() {
   if (this._prefix >= 127) {
     /* Support single-address and point-to-point networks */
     return this._addr;
@@ -383,7 +383,7 @@ CIDR.prototype.first = function cidrFirst(input) {
   }
 };
 
-CIDR.prototype.last = function cidrLast(input) {
+CIDR.prototype.last = function cidrLast() {
   var ending = this._addr.or(this._mask.not());
   if (this._prefix >= 127) {
     /* Support single-address and point-to-point networks */
@@ -452,7 +452,7 @@ function ip6cidrCompare(a, b) {
   /*
    * We compare first on the address component, and then on the prefix length,
    * such that the network with the smaller prefix length (the larger subnet)
-   * is greater than the network with the smaller prefix (the smaller subnet).
+   * is greater than the network with the larger prefix (the smaller subnet).
    * This is the same ordering used in Postgres.
    */
   var cmp = ip6addrCompare(a._addr, b._addr);
