@@ -9,6 +9,7 @@
  */
 
 var assert = require('assert-plus');
+var jsprim = require('jsprim');
 var util = require('util');
 
 
@@ -613,16 +614,16 @@ function parseString(input) {
   var field, num;
   for (i = 0; i < ip6Fields.length; i++) {
     field = ip6Fields[i];
-    num = Number('0x' + field);
-    if (isNaN(num) || num < 0 || num > 65535) {
+    num = jsprim.parseInteger(field, { base: 16, allowSign: false });
+    if (num instanceof Error || num < 0 || num > 65535) {
       throw new ParseError(input, 'Invalid field value: ' + field);
     }
     ip6Fields[i] = num;
   }
   for (i = 0; i < ip4Fields.length; i++) {
     field = ip4Fields[i];
-    num = Number(field);
-    if (parseInt(field, 10) !== num || num < 0 || num > 255) {
+    num = jsprim.parseInteger(field, { base: 10, allowSign: false });
+    if (num instanceof Error || num < 0 || num > 255) {
       throw new ParseError(input, 'Invalid field value: ' + field);
     }
     ip4Fields[i] = num;
