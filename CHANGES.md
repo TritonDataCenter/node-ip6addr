@@ -1,5 +1,9 @@
 # ip6addr Changelog
 
+## 0.2.3
+
+- Fix some edge cases with parsing numbers (#6)
+
 ## 0.2.2
 
 - Simplify Addr.clone()

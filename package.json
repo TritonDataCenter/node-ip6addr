@@ -7,6 +7,9 @@
     "type": "git",
     "url": "git://github.com/joyent/node-ip6addr.git"
   },
+  "bugs": {
+    "url": "https://github.com/joyent/node-ip6addr/issues"
+  },
   "main": "ip6addr.js",
   "dependencies": {
     "assert-plus": "^1.0.0",

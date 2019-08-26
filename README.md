@@ -321,4 +321,4 @@ Returns the last address in this range.
 This Source Code Form is subject to the terms of the Mozilla Public License, v.
 2.0.  For the full license text see LICENSE, or http://mozilla.org/MPL/2.0/.
 
-Copyright (c) 2017, Joyent, Inc.
+Copyright (c) 2019, Joyent, Inc.
