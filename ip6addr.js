@@ -500,10 +500,12 @@ function ip6addrParse(input) {
     return parseString(input);
   } else if (typeof (input) === 'number') {
     return parseLong(input);
+  } else if (Buffer.isBuffer(input)) {
+    return parseBuffer(input);
   } else if (typeof (input) === 'object' && _isAddr(input)) {
     return input;
   } else {
-    throw new Error('Invalid argument: only string|number allowed');
+    throw new Error('Invalid argument: only string|number|Buffer allowed');
   }
 }
 
@@ -680,6 +682,26 @@ function parseLong(input) {
   out._fields[5] = 0xffff;
   out._attrs.ipv4Bare = true;
   out._attrs.ipv4Mapped = true;
+  return out;
+}
+
+function parseBuffer(input) {
+  if (input.length !== 16) {
+    throw new Error('Buffer must have length of 16');
+  }
+  var out = new Addr();
+  for (i = 0; i < 8; i++) {
+    out._fields[i] = (input[i * 2] << 8) + input[(i * 2) + 1];  
+  }
+  
+  if (input.filter((_, i) => i < 10).every(v => v === 0)) { // the first 10 bytes are zero
+    if ((input[10] === 0 && input[11] === 0) || (input[10] === 255 && input[11] === 255)) {
+    /* this is ipv4-mapped */
+    out._fields[5] = 0xffff;
+    out._attrs.ipv4Bare = true;
+    out._attrs.ipv4Mapped = true;
+    }
+  }
   return out;
 }
 

@@ -105,3 +105,43 @@ test('parse long', function (t) {
   t.throws(pb(1.5), null, 'float throws');
   t.end();
 });
+
+test('parse buffer', function (t) {
+  t.ok(parse(0));
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 127, 0, 0, 1 ])).toString(), '127.0.0.1');
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255 ])).toString(), '255.255.255.255');
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])).toString(), '0.0.0.0');
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 168, 0, 2 ])).toString(), '192.168.0.2');
+
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 127, 0, 0, 1 ])).toString(), '127.0.0.1');
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255 ])).toString(), '255.255.255.255');
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0 ])).toString(), '0.0.0.0');
+  t.equal(parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 192, 168, 0, 2 ])).toString(), '192.168.0.2');
+
+  t.equal(parse(Buffer.from([ 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8])).toString(), '1:2:3:4:5:6:7:8');
+
+  t.equal(parse(Buffer.from([ 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])).toString(), 'ff00::');
+  t.equal(parse(Buffer.from([ 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])).toString(), 'ff::');
+  t.equal(parse(Buffer.from([ 255, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])).toString(), 'ff80::');
+  t.equal(parse(Buffer.from([ 255, 128, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])).toString(), 'ff80:4000::');
+  t.equal(parse(Buffer.from([ 255, 128, 64, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])).toString(), 'ff80:4020::');
+
+  var strAddr = parse('1.2.3.4');
+  var bufferAddr = parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4 ]));
+  t.equal(0, strAddr.compare(bufferAddr), 'parsing as buffer or long should be equivalent');
+
+  var ipv41 = parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 168, 0, 2 ]));
+  var ipv42 = parse(Buffer.from([ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 192, 168, 0, 2 ]));
+  t.equal(0, ipv41.compare(ipv42), 'parsing a ipv4 representation of a buffer with bytes 11 and 12 equally 0x00 or 0xff should be equivalent');
+
+  var a = parse('32.54.121.2');
+  var b = parse(a.toBuffer());
+  t.equal(0, a.compare(b), 'should be able to go back and forth between buffer and Addr for ipv4');
+
+  var d = parse('f402:87ab:4::32:393a');
+  var e = parse(d.toBuffer());
+  t.equal(0, d.compare(e), 'should be able to go back and forth between buffer and Addr for ipv6');
+
+  t.end();
+});
+
