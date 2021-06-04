@@ -245,7 +245,7 @@ Addr.prototype.toBuffer = function toBuffer(buf) {
       throw new Error('optional arg must be Buffer');
     }
   } else {
-    buf = new Buffer(16);
+    buf = Buffer.alloc(16);
   }
   var i;
   for (i = 0; i < 8; i++) {
