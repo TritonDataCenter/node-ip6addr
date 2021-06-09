@@ -686,6 +686,7 @@ function parseLong(input) {
 }
 
 function parseBuffer(input) {
+  assert.buffer(input);
   if (input.length !== 16) {
     throw new Error('Buffer must have length of 16');
   }
@@ -693,13 +694,10 @@ function parseBuffer(input) {
   for (i = 0; i < 8; i++) {
     out._fields[i] = (input[i * 2] << 8) + input[(i * 2) + 1];  
   }
-  
   if (input.filter((_, i) => i < 10).every(v => v === 0)) { // the first 10 bytes are zero
-    if ((input[10] === 0 && input[11] === 0) || (input[10] === 255 && input[11] === 255)) {
-    /* this is ipv4-mapped */
-    out._fields[5] = 0xffff;
-    out._attrs.ipv4Bare = true;
-    out._attrs.ipv4Mapped = true;
+    if ((input[10] === 255 && input[11] === 255)) {
+      /* this is ipv4-mapped */
+      out._attrs.ipv4Mapped = true;
     }
   }
   return out;
