@@ -1,11 +1,17 @@
 {
   "name": "ip6addr",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "IPv6/IPv4 address parsing and manipulation",
-  "keywords": [ "ip", "ipv4", "ipv6", "cidr", "subnet" ],
+  "keywords": [
+    "ip",
+    "ipv4",
+    "ipv6",
+    "cidr",
+    "subnet"
+  ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/joyent/node-ip6addr.git"
+    "url": "https://github.com/joyent/node-ip6addr.git"
   },
   "bugs": {
     "url": "https://github.com/joyent/node-ip6addr/issues"
