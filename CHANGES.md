@@ -1,5 +1,13 @@
 # ip6addr Changelog
 
+## 0.2.5
+
+- #15 Upgrade jsprism to latest version
+
+## 0.2.4
+
+- TOOLS-2525 Everything needs to stop cloning with git:// URLs
+
 ## 0.2.3
 
 - Fix some edge cases with parsing numbers (#6)
